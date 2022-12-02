@@ -1,0 +1,10 @@
+LICENSE
+README.md
+setup.py
+CNN_benchmark/__init__.py
+CNN_benchmark/benchmark.py
+CNN_benchmark.egg-info/PKG-INFO
+CNN_benchmark.egg-info/SOURCES.txt
+CNN_benchmark.egg-info/dependency_links.txt
+CNN_benchmark.egg-info/not-zip-safe
+CNN_benchmark.egg-info/top_level.txt

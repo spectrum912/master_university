@@ -1,0 +1,7 @@
+setuptools~=49.2.1
+opencv-python~=4.5.1.48
+numpy~=1.21.2
+matplotlib~=3.4.3
+scipy~=1.9.3
+yolov5~=6.2.3
+ksvd~=0.0.3
