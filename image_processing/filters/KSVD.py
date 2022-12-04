@@ -1,5 +1,5 @@
 # coding: utf-8
-
+import cv2
 import numpy as np
 from skimage import io, util
 from sklearn.feature_extraction import image
@@ -12,8 +12,9 @@ def clip(img):
     return img
 
 
-def ksvd(input_img, output_img):
-    img = util.img_as_float(io.imread(input_img))
+def ksvd(input_img):
+    cv2.imwrite("temp_img.png", input_img)
+    img = util.img_as_float(io.imread("temp_img.png"))
     patch_size = (5, 5)
     patches = image.extract_patches_2d(img, patch_size)
     signals = patches.reshape(patches.shape[0], -1)
@@ -25,7 +26,8 @@ def ksvd(input_img, output_img):
     reduced = gamma.dot(dictionary) + mean
     reduced_img = image.reconstruct_from_patches_2d(
         reduced.reshape(patches.shape), img.shape)
-    io.imsave(output_img, clip(reduced_img))
+    io.imsave("temp_img.png", clip(reduced_img))
+    return cv2.imread("temp_img.png")
 
 # import dictlearn as dl
 # import matplotlib.pyplot as plt

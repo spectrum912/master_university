@@ -98,6 +98,9 @@ if __name__ == "__main__":
 
     elif filter_type == "KSVD":
         print("K-SVD")
-        ksvd(f"{result_path}/{noise_type}_Noise.png", f"{result_path}/{noise_type}_K-SVD.png")
-        img = cv2.imread(f"{result_path}/{noise_type}_K-SVD.png")
+        img = ksvd(img_noise)
+        cv2.imwrite(f"{result_path}/{noise_type}_K-SVD.png", img)
         print(metric(image_loaded, img)[0])
+        # ksvd(f"{result_path}/{noise_type}_Noise.png", f"{result_path}/{noise_type}_K-SVD.png")
+        # img = cv2.imread(f"{result_path}/{noise_type}_K-SVD.png")
+        # print(metric(image_loaded, img)[0])
