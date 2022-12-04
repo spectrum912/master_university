@@ -38,18 +38,18 @@ def metric(original, noised):
 
 if __name__ == "__main__":
     result_path = "test_result"
-    noise_type = "AWGN"
-    filter_type = "MEDIAN"
+    noise_type = "SPECKLE"
+    filter_type = "DCT"
 
     image_loaded = cv2.imread("image_Lena512rgb.png")
 
     if noise_type == "AWGN":
         img_noise = AWGN.AWGN(image_loaded, 20)  # .astype(int)
-    elif noise_type == "ASCN":  # ПАЛАМАЛАСЬ
+    elif noise_type == "ASCN":
         img_noise = ASCN.ASCN(image_loaded, 10, 0.4)
     elif noise_type == "MULT":
         img_noise = Mult.Mult(image_loaded, 5)
-    elif noise_type == "SPECKLE":  # похоже на рабочее
+    elif noise_type == "SPECKLE":
         img_noise = Speckle.Speckle(image_loaded, 4, 0.5)
     elif noise_type == "COPY":
         img_noise = copy.copy(image_loaded)
