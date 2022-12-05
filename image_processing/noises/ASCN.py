@@ -5,6 +5,8 @@ import cv2
 
 def __ascn2D_fft_gen(AWGN, gsigma):
     s = AWGN.shape
+
+
     x = range(int(-s[1] / 2), int(s[1] / 2))
     y = range(int(-s[0] / 2), int(s[0] / 2))
     xgrid, ygrid = np.meshgrid(x, y)
@@ -15,6 +17,8 @@ def __ascn2D_fft_gen(AWGN, gsigma):
             G[i, j] = m.exp(-m.pi * (xgrid[i, j] ** 2 + ygrid[i, j] ** 2) / (2 * gsigma ** 2))
     g = np.fft.fft2(G)
     n = np.fft.fft2(AWGN)
+
+
     ASCN = np.fft.ifft2(g * n)
     ASCN = ASCN / np.std(ASCN)
     return ASCN

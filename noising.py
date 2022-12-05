@@ -26,7 +26,10 @@ processed_path = 'E:\\diplom\\noised'
 cv2.setUseOptimized(True)
 
 
+
+
 def processing_noise(image):
+
     image_loaded = cv2.imread(f"{image_path}/{image}")
 
     img_noise = AWGN.AWGN(image_loaded, 5)  # .astype(int)
@@ -67,6 +70,12 @@ if __name__ == '__main__':
     POOL_SIZE = os.cpu_count() - 2
     with Executor(max_workers=POOL_SIZE) as executor:
         executor.map(processing_noise, os.listdir(path=os.path.join(image_path)))
+    # i = 0
+    # for f in os.listdir(path=os.path.join(image_path)):
+    #     i += 1
+    #     print(i)
+    #     processing_noise(f)
+
 
 # filtering_frost(os.listdir(path=os.path.join(image_path))[0])
 

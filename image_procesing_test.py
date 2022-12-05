@@ -42,7 +42,7 @@ if __name__ == "__main__":
     noises = ["ASCN", "MULT", "SPECKLE"]
     filters = ["BM3D", "DCT", "FROST", "LEE", "MEDIAN", "KSVD"]
 
-    noise_type = "ASCN"
+    noise_type = "SPECKLE"
     filter_type = ""
 
     image_path = "image_Lena512rgb.png"
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     elif noise_type == "MULT":
         img_noise = Mult.Mult(image_loaded, 5)
     elif noise_type == "SPECKLE":
-        img_noise = Speckle.Speckle(image_loaded, 4, 0.5)
+        img_noise = Speckle.Speckle(image_loaded, 1, 1)
     elif noise_type == "COPY":
         img_noise = copy.copy(image_loaded)
 
