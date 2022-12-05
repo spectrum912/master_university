@@ -39,8 +39,11 @@ def metric(original, noised):
 
 if __name__ == "__main__":
     result_path = "test_result"
-    noise_type = "AWGN"
-    filter_type = "KSVD"
+    noises = ["ASCN", "MULT", "SPECKLE"]
+    filters = ["BM3D", "DCT", "FROST", "LEE", "MEDIAN", "KSVD"]
+
+    noise_type = "ASCN"
+    filter_type = ""
 
     image_path = "image_Lena512rgb.png"
     image_loaded = cv2.imread(image_path)
@@ -48,7 +51,7 @@ if __name__ == "__main__":
     if noise_type == "AWGN":
         img_noise = AWGN.AWGN(image_loaded, 20)  # .astype(int)
     elif noise_type == "ASCN":
-        img_noise = ASCN.ASCN(image_loaded, 10, 0.4)
+        img_noise = ASCN.ASCN(image_loaded, 10, 0.8)
     elif noise_type == "MULT":
         img_noise = Mult.Mult(image_loaded, 5)
     elif noise_type == "SPECKLE":
@@ -59,7 +62,7 @@ if __name__ == "__main__":
     if noise_type != "":
         cv2.imwrite(f"{result_path}/{noise_type}_Noise.png", img_noise)
 
-    if filter_type == "BM3D":
+    if filter_type == "BM3D":  # 6 MIN
         print("BM3D")
         imgYCB = cv2.cvtColor(img_noise.astype(np.uint8), cv2.COLOR_BGR2YCrCb)
 
@@ -72,31 +75,31 @@ if __name__ == "__main__":
         cv2.imwrite(f"{result_path}/{noise_type}_Final_sigma_color.png", cv2.cvtColor(Final_img, cv2.COLOR_YCrCb2BGR))
         print(metric(image_loaded, Final_img)[0])
 
-    elif filter_type == "DCT":
+    elif filter_type == "DCT":  # 1.5 MIN
         print("DCT")
         img = DCT.dct_filter(img_noise, 100)
         cv2.imwrite(f"{result_path}/{noise_type}_DCT_color.png", img)
         print(metric(image_loaded, img)[0])
 
-    elif filter_type == "FROST":
+    elif filter_type == "FROST":  # 1 MIN
         print("Frost")
         img = Frost.Frost(img_noise)
         cv2.imwrite(f"{result_path}/{noise_type}_Frost.png", img)
         print(metric(image_loaded, img)[0])
 
-    elif filter_type == "LEE":
+    elif filter_type == "LEE":  # 1 MIN
         print("Lee")
         img = Lee.lee_filter(img_noise, 5, 20 ** 2)
         cv2.imwrite(f"{result_path}/{noise_type}_Lee.png", Lee.lee_filter(img, 5, 20 ** 2))
         print(metric(image_loaded, img)[0])
 
-    elif filter_type == "MEDIAN":
+    elif filter_type == "MEDIAN":  # 0 MIN
         print("Median")
         img = Median.median_filter(img_noise, 3)
         cv2.imwrite(f"{result_path}/{noise_type}_Median.png", img)
         print(metric(image_loaded, img)[0])
 
-    elif filter_type == "KSVD":
+    elif filter_type == "KSVD":  # 2 MIN
         print("K-SVD")
         img = ksvd(img_noise)
         cv2.imwrite(f"{result_path}/{noise_type}_K-SVD.png", img)
