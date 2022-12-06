@@ -22,7 +22,7 @@ def ConfusionMatrix(confusion_matrix, labels=None, show=True, save=False, name="
 
     for i in range(np.shape(confusion_matrix)[0]):
         for j in range(np.shape(confusion_matrix)[1]):
-             text = ax.text(j, i, f"{int(confusion_matrix[i, j])}",
+            text = ax.text(j, i, f"{int(confusion_matrix[i, j])}",
                            ha="center", va="center", color="w")
 
     plt.xlabel("True label")

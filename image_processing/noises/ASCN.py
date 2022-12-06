@@ -5,8 +5,6 @@ import cv2
 
 def __ascn2D_fft_gen(AWGN, gsigma):
     s = AWGN.shape
-
-
     x = range(int(-s[1] / 2), int(s[1] / 2))
     y = range(int(-s[0] / 2), int(s[0] / 2))
     xgrid, ygrid = np.meshgrid(x, y)

@@ -12,6 +12,7 @@ from image_processing.noises import AWGN, ASCN, Mult, Speckle
 '''For image filtering'''
 from image_processing.filters import DCT, Frost, Lee, Median
 from image_processing.filters.BM3D_color import BM3D_1st_step_color
+from image_processing.filters.KSVD import ksvd
 
 '''End'''
 '''For image metric'''
@@ -20,12 +21,32 @@ from image_processing.filters.BM3D_color import BM3D_1st_step_color
 
 from concurrent.futures import ProcessPoolExecutor as Executor
 
-image_path = 'dataset/coco/train2017'
-processed_path = 'E:\\diplom\\noised'
 
+image_path = 'dataset/coco/train2017'
+processed_path = 'E:/diplom'
+
+typeOfNoise = 'AWGN_5'
 cv2.setUseOptimized(True)
 
+dirs_noise = ["AWGN_5", "AWGN_10", "AWGN_20", "AWGN_30", "MULT_1",
+              "MULT_3", "MULT_5", "MULT_7", "Speckle_1", "Speckle_5"]
+dirs_filter = ["BM3D", "DCT", "Frost", "Lee", "Median", "KSVD"]
 
+
+def make_dirs():
+    for df in dirs_filter:
+        path = processed_path + '\\filtered\\' + df
+        if not os.path.exists(path):
+            os.mkdir(path)
+        for dn in dirs_noise:
+            path = processed_path + '\\filtered\\' + df + '\\' + dn
+            if not os.path.exists(path):
+                os.mkdir(path)
+
+    for dn in dirs_noise:
+        path = processed_path + '\\noised\\' + dn
+        if not os.path.exists(path):
+            os.mkdir(path)
 
 
 def processing_noise(image):
@@ -33,70 +54,99 @@ def processing_noise(image):
     image_loaded = cv2.imread(f"{image_path}/{image}")
 
     img_noise = AWGN.AWGN(image_loaded, 5)  # .astype(int)
-    cv2.imwrite(f"{processed_path}/AWGN_5/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/AWGN_5/{image}", img_noise)
 
     img_noise = AWGN.AWGN(image_loaded, 10)  # .astype(int)
-    cv2.imwrite(f"{processed_path}/AWGN_10/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/AWGN_10/{image}", img_noise)
 
     img_noise = AWGN.AWGN(image_loaded, 20)  # .astype(int)
-    cv2.imwrite(f"{processed_path}/AWGN_20/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/AWGN_20/{image}", img_noise)
 
     img_noise = AWGN.AWGN(image_loaded, 30)  # .astype(int)
-    cv2.imwrite(f"{processed_path}/AWGN_30/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/AWGN_30/{image}", img_noise)
 
     # img_noise = ASCN.ASCN(image_loaded, 5, 0.8)
-    # cv2.imwrite(f"{processed_path}/ASCN_30/{image}", img_noise)
+    # cv2.imwrite(f"{processed_path}/noised/ASCN_30/{image}", img_noise)
 
-    img_noise = Mult.Mult(image_loaded, 1)
-    cv2.imwrite(f"{processed_path}/MULT_1/{image}", img_noise)
+    img_noise = Mult.Mult(image_loaded, 1)  # ли, фрост, медиан
+    cv2.imwrite(f"{processed_path}/noised/MULT_1/{image}", img_noise)
 
     img_noise = Mult.Mult(image_loaded, 3)
-    cv2.imwrite(f"{processed_path}/MULT_3/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/MULT_3/{image}", img_noise)
 
     img_noise = Mult.Mult(image_loaded, 5)
-    cv2.imwrite(f"{processed_path}/MULT_5/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/MULT_5/{image}", img_noise)
 
     img_noise = Mult.Mult(image_loaded, 7)
-    cv2.imwrite(f"{processed_path}/MULT_7/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/MULT_7/{image}", img_noise)
 
     img_noise = Speckle.Speckle(image_loaded, 1, 1)
-    cv2.imwrite(f"{processed_path}/Speckle_1/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/Speckle_1/{image}", img_noise)
 
     img_noise = Speckle.Speckle(image_loaded, 5, 1)
-    cv2.imwrite(f"{processed_path}/Speckle_5/{image}", img_noise)
+    cv2.imwrite(f"{processed_path}/noised/Speckle_5/{image}", img_noise)
+
+
+def processing_filter(img_noise):
+
+    img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
+    # BM3D - только первый шаг используй
+    imgYCB = cv2.cvtColor(img_read.astype(np.uint8), cv2.COLOR_BGR2YCrCb)
+
+    Basic_img = BM3D_1st_step_color(imgYCB)
+    cv2.imwrite(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}", cv2.cvtColor(Basic_img, cv2.COLOR_YCrCb2BGR))
+
+    img = DCT.dct_filter(img_read, 100)
+    cv2.imwrite(f"{processed_path}/filtered/DCT/{typeOfNoise}/{img_noise}", img)
+
+    img = Frost.Frost(img_read)
+    cv2.imwrite(f"{processed_path}/filtered/Frost/{typeOfNoise}/{img_noise}", img)
+
+    img = Lee.lee_filter(img_read, 5, 20 ** 2)
+    cv2.imwrite(f"{processed_path}/filtered/Lee/{typeOfNoise}/{img_noise}", Lee.lee_filter(img, 5, 20 ** 2))
+
+    img = Median.median_filter(img_read, 5)
+    cv2.imwrite(f"{processed_path}/filtered/Median/{typeOfNoise}/{img_noise}", img)
+
+    img = ksvd(img_read)
+    cv2.imwrite(f"{processed_path}/filtered/KSVD/{typeOfNoise}/{img_noise}", img)
 
 
 if __name__ == '__main__':
-    POOL_SIZE = os.cpu_count() - 2
-    with Executor(max_workers=POOL_SIZE) as executor:
-        executor.map(processing_noise, os.listdir(path=os.path.join(image_path)))
-    # i = 0
-    # for f in os.listdir(path=os.path.join(image_path)):
-    #     i += 1
-    #     print(i)
-    #     processing_noise(f)
+    # make_dirs()
+    # _________________NOISE___________________________________________________
+    # POOL_SIZE = os.cpu_count() - 2
+    # with Executor(max_workers=POOL_SIZE) as executor:
+    #     executor.map(processing_noise, os.listdir(path=os.path.join(image_path)))
+    # _________________NOISE___________________________________________________
+
+    # _________________FILTER___________________________________________________
+
+    typeOfNoise = 'AWGN_5'
+    if typeOfNoise in dirs_noise:
+        print("start")
+        im_path = f"{processed_path}/noised/{typeOfNoise}"
+        POOL_SIZE = os.cpu_count() - 2
+        with Executor(max_workers=POOL_SIZE) as executor:
+            try:
+                for r in executor.map(processing_filter, os.listdir(im_path)):
+                    try:
+                        print(r)
+                    except Exception as exc:
+                        print(f'Catch inside: {exc}')
+            except Exception as exc:
+                print(f'Catch outside: {exc}')
+
+    # _________________FILTER___________________________________________________
 
 
-# filtering_frost(os.listdir(path=os.path.join(image_path))[0])
 
-# for image in os.listdir(path=os.path.join(image_path)):
-#     th = Process(target=filtering, args=(image_path, image))
-#     th.start()
-#     c -= 1
-#     if c == 0:
-#         break
-
-
-# for image in os.listdir(path=os.path.join(image_path)):  # Start image processing loop
-#     image_loaded = cv2.imread(f"{image_path}/{image}")
-#     image_noised = img = ASCN.ASCN(image_loaded, 5, 0.8)
-#     cv2.imwrite(f"{noised_path}/{image}", image_noised)
-#     images_c -= 1
-#     if images_c == 0:
-#         break
-# img_noise = AWGN.AWGN(image_loaded, 20)  # .astype(int)
-# img = ASCN.ASCN(image_loaded, 10, 0.4)
-# img = Mult.Mult(image_loaded, 5)
-# img = Speckle.Speckle(image_loaded, 4, 0.5)
-# img = copy.copy(image_loaded)
-# cv2.imwrite("Noise.png", img_noise)
+    # typeOfNoise = 'AWGN_5'
+    # if typeOfNoise in dirs_noise:
+    #     print("start")
+    #     im_path = processed_path + '/' + 'noised' + '/' + typeOfNoise
+    #     i = 0
+    #     for f in os.listdir(path=os.path.join(im_path)):
+    #         i += 1
+    #         print(i)
+    #         processing_filter(f)

@@ -3,7 +3,7 @@ import math as m
 import copy
 
 
-def Frost(image, Damp_fact=1, sz=5):
+def Frost(image, Damp_fact=1, sz=7):
     nimg = copy.copy(image)
     for color in range(3):
         image = nimg[:, :, color]
