@@ -25,7 +25,6 @@ from concurrent.futures import ProcessPoolExecutor as Executor
 image_path = 'dataset/coco/train2017'
 processed_path = 'E:/diplom'
 
-typeOfNoise = 'AWGN_5'
 cv2.setUseOptimized(True)
 
 dirs_noise = ["AWGN_5", "AWGN_10", "AWGN_20", "AWGN_30", "MULT_1",
@@ -87,29 +86,35 @@ def processing_noise(image):
     cv2.imwrite(f"{processed_path}/noised/Speckle_5/{image}", img_noise)
 
 
-def processing_filter(img_noise):
+def processing_filter(typeOfNoise):
 
-    img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
-    # BM3D - только первый шаг используй
-    imgYCB = cv2.cvtColor(img_read.astype(np.uint8), cv2.COLOR_BGR2YCrCb)
+    for img_noise in os.listdir(f"{processed_path}/noised/{typeOfNoise}"):
+        print(img_noise)
+        img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
 
-    Basic_img = BM3D_1st_step_color(imgYCB)
-    cv2.imwrite(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}", cv2.cvtColor(Basic_img, cv2.COLOR_YCrCb2BGR))
+        if not os.path.exists(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}"):
+            imgYCB = cv2.cvtColor(img_read.astype(np.uint8), cv2.COLOR_BGR2YCrCb)
+            Basic_img = BM3D_1st_step_color(imgYCB)
+            cv2.imwrite(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}", cv2.cvtColor(Basic_img, cv2.COLOR_YCrCb2BGR))
 
-    img = DCT.dct_filter(img_read, 100)
-    cv2.imwrite(f"{processed_path}/filtered/DCT/{typeOfNoise}/{img_noise}", img)
+        if not os.path.exists(f"{processed_path}/filtered/DCT/{typeOfNoise}/{img_noise}"):
+            img = DCT.dct_filter(img_read, 100)
+            cv2.imwrite(f"{processed_path}/filtered/DCT/{typeOfNoise}/{img_noise}", img)
 
-    img = Frost.Frost(img_read)
-    cv2.imwrite(f"{processed_path}/filtered/Frost/{typeOfNoise}/{img_noise}", img)
+        if not os.path.exists(f"{processed_path}/filtered/Frost/{typeOfNoise}/{img_noise}"):
+            img = Frost.Frost(img_read)
+            cv2.imwrite(f"{processed_path}/filtered/Frost/{typeOfNoise}/{img_noise}", img)
 
-    img = Lee.lee_filter(img_read, 5, 20 ** 2)
-    cv2.imwrite(f"{processed_path}/filtered/Lee/{typeOfNoise}/{img_noise}", Lee.lee_filter(img, 5, 20 ** 2))
+        if not os.path.exists(f"{processed_path}/filtered/Lee/{typeOfNoise}/{img_noise}"):
+            img = Lee.lee_filter(img_read, 5, 20 ** 2)
+            cv2.imwrite(f"{processed_path}/filtered/Lee/{typeOfNoise}/{img_noise}", Lee.lee_filter(img, 5, 20 ** 2))
 
-    img = Median.median_filter(img_read, 5)
-    cv2.imwrite(f"{processed_path}/filtered/Median/{typeOfNoise}/{img_noise}", img)
-
-    img = ksvd(img_read)
-    cv2.imwrite(f"{processed_path}/filtered/KSVD/{typeOfNoise}/{img_noise}", img)
+        if not os.path.exists(f"{processed_path}/filtered/Median/{typeOfNoise}/{img_noise}"):
+            img = Median.median_filter(img_read, 5)
+            cv2.imwrite(f"{processed_path}/filtered/Median/{typeOfNoise}/{img_noise}", img)
+        if not os.path.exists(f"{processed_path}/filtered/KSVD/{typeOfNoise}/{img_noise}"):
+            img = ksvd(img_read)
+            cv2.imwrite(f"{processed_path}/filtered/KSVD/{typeOfNoise}/{img_noise}", img)
 
 
 if __name__ == '__main__':
@@ -122,24 +127,21 @@ if __name__ == '__main__':
 
     # _________________FILTER___________________________________________________
 
-    typeOfNoise = 'AWGN_5'
-    if typeOfNoise in dirs_noise:
-        print("start")
-        im_path = f"{processed_path}/noised/{typeOfNoise}"
-        POOL_SIZE = os.cpu_count() - 2
-        with Executor(max_workers=POOL_SIZE) as executor:
-            try:
-                for r in executor.map(processing_filter, os.listdir(im_path)):
-                    try:
-                        print(r)
-                    except Exception as exc:
-                        print(f'Catch inside: {exc}')
-            except Exception as exc:
-                print(f'Catch outside: {exc}')
+    print("start")
+    im_path = f"{processed_path}/noised"
+    POOL_SIZE = os.cpu_count() - 2
+
+    with Executor(max_workers=POOL_SIZE) as executor:
+        try:
+            for r in executor.map(processing_filter, os.listdir(im_path)):
+                try:
+                    print(r)
+                except Exception as exc:
+                    print(f'Catch inside: {exc}')
+        except Exception as exc:
+            print(f'Catch outside: {exc}')
 
     # _________________FILTER___________________________________________________
-
-
 
     # typeOfNoise = 'AWGN_5'
     # if typeOfNoise in dirs_noise:
