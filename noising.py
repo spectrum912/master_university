@@ -89,32 +89,40 @@ def processing_noise(image):
 def processing_filter(typeOfNoise):
 
     for img_noise in os.listdir(f"{processed_path}/noised/{typeOfNoise}"):
+
         print(img_noise)
-        img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
 
         if not os.path.exists(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}"):
+            img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             imgYCB = cv2.cvtColor(img_read.astype(np.uint8), cv2.COLOR_BGR2YCrCb)
             Basic_img = BM3D_1st_step_color(imgYCB)
             cv2.imwrite(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}", cv2.cvtColor(Basic_img, cv2.COLOR_YCrCb2BGR))
 
         if not os.path.exists(f"{processed_path}/filtered/DCT/{typeOfNoise}/{img_noise}"):
+            img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             img = DCT.dct_filter(img_read, 100)
             cv2.imwrite(f"{processed_path}/filtered/DCT/{typeOfNoise}/{img_noise}", img)
 
         if not os.path.exists(f"{processed_path}/filtered/Frost/{typeOfNoise}/{img_noise}"):
+            img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             img = Frost.Frost(img_read)
             cv2.imwrite(f"{processed_path}/filtered/Frost/{typeOfNoise}/{img_noise}", img)
 
         if not os.path.exists(f"{processed_path}/filtered/Lee/{typeOfNoise}/{img_noise}"):
+            img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             img = Lee.lee_filter(img_read, 5, 20 ** 2)
             cv2.imwrite(f"{processed_path}/filtered/Lee/{typeOfNoise}/{img_noise}", Lee.lee_filter(img, 5, 20 ** 2))
 
         if not os.path.exists(f"{processed_path}/filtered/Median/{typeOfNoise}/{img_noise}"):
+            img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             img = Median.median_filter(img_read, 5)
             cv2.imwrite(f"{processed_path}/filtered/Median/{typeOfNoise}/{img_noise}", img)
+
         if not os.path.exists(f"{processed_path}/filtered/KSVD/{typeOfNoise}/{img_noise}"):
+            img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             img = ksvd(img_read)
             cv2.imwrite(f"{processed_path}/filtered/KSVD/{typeOfNoise}/{img_noise}", img)
+
 
 
 if __name__ == '__main__':
@@ -129,7 +137,7 @@ if __name__ == '__main__':
 
     print("start")
     im_path = f"{processed_path}/noised"
-    POOL_SIZE = os.cpu_count() - 2
+    POOL_SIZE = os.cpu_count() - 1
 
     with Executor(max_workers=POOL_SIZE) as executor:
         try:
@@ -143,12 +151,10 @@ if __name__ == '__main__':
 
     # _________________FILTER___________________________________________________
 
-    # typeOfNoise = 'AWGN_5'
-    # if typeOfNoise in dirs_noise:
-    #     print("start")
-    #     im_path = processed_path + '/' + 'noised' + '/' + typeOfNoise
-    #     i = 0
-    #     for f in os.listdir(path=os.path.join(im_path)):
-    #         i += 1
-    #         print(i)
-    #         processing_filter(f)
+    # print("start")
+    # im_path = f"{processed_path}/noised"
+    # i = 0
+    # for f in os.listdir(path=os.path.join(im_path)):
+    #     i += 1
+    #     print(i)
+    #     processing_filter(f)
