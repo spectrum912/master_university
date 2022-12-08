@@ -136,6 +136,7 @@ if __name__ == '__main__':
     # _________________FILTER___________________________________________________
 
     print("start")
+
     im_path = f"{processed_path}/noised"
     POOL_SIZE = os.cpu_count() - 1
 
