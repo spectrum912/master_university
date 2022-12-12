@@ -9,6 +9,7 @@ from CNN_benchmark.draw import drawMatrix
 from CNN_benchmark.statistical import ConfusionMatrix, IOU
 from CNN_benchmark.statistical.IOU import __calc_iou
 import datetime
+import json
 
 '''For image distortion'''
 from image_processing.noises import AWGN, ASCN, Mult, Speckle
@@ -31,8 +32,8 @@ from image_procesing_test import metric
 '''End'''
 
 # Load images from dataset
-image_path = 'dataset/coco/train2017'  # for coco -> 'dataset/voc/JPEGImages'
-set_name = "coco"
+image_path = "E:/diplom/filtered/BM3D/AWGN_20"  # 'dataset/coco/train2017'  # for coco -> 'dataset/voc/JPEGImages'
+set_name = "AWGN_20-BM3D"
 
 image_list = []
 
@@ -60,6 +61,7 @@ classes = [v for v in classnames.values()]
 start = datetime.datetime.now()
 
 length_images = 10000
+
 for images in batch_loop(os.listdir(path=os.path.join(image_path)), image_batch):  # Start image processing loop
 
     images_b = []  # batch of images
@@ -120,11 +122,27 @@ for images in batch_loop(os.listdir(path=os.path.join(image_path)), image_batch)
 
 print(datetime.datetime.now() - start)
 
-conf = ConfusionMatrix.ConfusionMatrix(y_t, y_p, name=set_name)
 
+y_t = [int(i) for i in y_t]
+y_p = [int(i) for i in y_p]
 iou = IOU.IoU(t_b, p_b)
-print(iou)
-drawMatrix.ConfusionMatrix(conf, save=True, name=f"{set_name} {iou}")
-result_file.write(f"IOU: {iou}\n")
 
-result_file.close()
+if os.path.exists('processed.json'):
+    with open('processed.json', 'rt') as f:
+        res_dict = json.load(f)
+
+    res_dict[set_name] = {"y_t": y_t, "y_p": y_p, "IOU": iou}
+else:
+    res_dict = {set_name: {"y_t": y_t, "y_p": y_p, "IOU": iou}}
+
+with open('processed.json', 'w') as f:
+    json.dump(res_dict, f)
+
+# conf = ConfusionMatrix.ConfusionMatrix(y_t, y_p, name=set_name, class_length=None)
+#
+# iou = IOU.IoU(t_b, p_b)
+# print(iou)
+# drawMatrix.ConfusionMatrix(conf, save=True, name=f"{set_name} {iou}")
+# result_file.write(f"{set_name} IOU: {iou}\n")
+#
+# result_file.close()

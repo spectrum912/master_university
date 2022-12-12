@@ -21,7 +21,6 @@ from image_processing.filters.KSVD import ksvd
 
 from concurrent.futures import ProcessPoolExecutor as Executor
 
-
 image_path = 'dataset/coco/train2017'
 processed_path = 'E:/diplom'
 
@@ -49,7 +48,6 @@ def make_dirs():
 
 
 def processing_noise(image):
-
     image_loaded = cv2.imread(f"{image_path}/{image}")
 
     img_noise = AWGN.AWGN(image_loaded, 5)  # .astype(int)
@@ -64,6 +62,7 @@ def processing_noise(image):
     img_noise = AWGN.AWGN(image_loaded, 30)  # .astype(int)
     cv2.imwrite(f"{processed_path}/noised/AWGN_30/{image}", img_noise)
 
+    # ASCN.ASCN(image_loaded, 10, 0.4) ?
     # img_noise = ASCN.ASCN(image_loaded, 5, 0.8)
     # cv2.imwrite(f"{processed_path}/noised/ASCN_30/{image}", img_noise)
 
@@ -87,7 +86,6 @@ def processing_noise(image):
 
 
 def processing_filter(typeOfNoise):
-
     for img_noise in os.listdir(f"{processed_path}/noised/{typeOfNoise}"):
 
         print(img_noise)
@@ -96,7 +94,8 @@ def processing_filter(typeOfNoise):
             img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             imgYCB = cv2.cvtColor(img_read.astype(np.uint8), cv2.COLOR_BGR2YCrCb)
             Basic_img = BM3D_1st_step_color(imgYCB)
-            cv2.imwrite(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}", cv2.cvtColor(Basic_img, cv2.COLOR_YCrCb2BGR))
+            cv2.imwrite(f"{processed_path}/filtered/BM3D/{typeOfNoise}/{img_noise}",
+                        cv2.cvtColor(Basic_img, cv2.COLOR_YCrCb2BGR))
 
         if not os.path.exists(f"{processed_path}/filtered/DCT/{typeOfNoise}/{img_noise}"):
             img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
@@ -122,7 +121,6 @@ def processing_filter(typeOfNoise):
             img_read = cv2.imread(f"{processed_path}/noised/{typeOfNoise}/{img_noise}")
             img = ksvd(img_read)
             cv2.imwrite(f"{processed_path}/filtered/KSVD/{typeOfNoise}/{img_noise}", img)
-
 
 
 if __name__ == '__main__':
