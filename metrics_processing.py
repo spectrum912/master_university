@@ -19,4 +19,4 @@ for set_name in res_dict.keys():
     drawMatrix.ConfusionMatrix(conf, save=True, show=False, name=f"{set_name} {iou}")
     result_file.write(f"{set_name} IOU: {iou}\n")
 
-    result_file.close()
+result_file.close()
